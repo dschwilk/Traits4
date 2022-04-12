@@ -43,7 +43,7 @@ PruneTree <- function(desir_species, master_tree){
                     TreeGenera = sapply(strsplit(DesiredSpecies,"_"),function(x) x[1]))
   bbb <- merge(aaa, SpeciesListGenera)
   
-  treeTestedSpecies$tip.label <- mapvalues(treeTestedSpecies$tip.label, c(bbb$TreeSpecies), c(bbb$DesiredSpecies))
+  treeTestedSpecies$tip.label <- plyr::mapvalues(treeTestedSpecies$tip.label, c(bbb$TreeSpecies), c(bbb$DesiredSpecies))
   tree_x <- treeTestedSpecies
 #  plotTree(tree_x, ftype="i")
   return(tree_x)

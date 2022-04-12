@@ -1,16 +1,22 @@
+## DWS: this script is named "part 2" but it sources in the lib_dat_prep.R code
+## that reads in data. The aprt 1 code does not. I do not understand the
+## organization.
+
 ## set working directory
-setwd("~/Desktop/Research Projects/Traits/GitRepo/Traits4") 
+##setwd("~/Desktop/Research Projects/Traits/GitRepo/Traits4") 
+
+## DWS: Never
 
 ## source the scripts: data and functions
-source("Scripts/lib_dat_prep.R")
-source("Scripts/func_prun_replac.R")
-source("Scripts/func_phylosig.R")
-source("Scripts/func_phylosig_parallel.R")
-source("Scripts/func_model_aicc.R")
+source("scripts/lib_dat_prep.R")
+source("scripts/func_prun_replac.R")
+source("scripts/func_phylosig.R")
+source("scripts/func_phylosig_parallel.R")
+source("scripts/func_model_aicc.R")
 
 
-library(dplyr)
-library(ggplot2)
+#library(dplyr)
+#library(ggplot2)
 library(parallel)
 library(foreach)
 library(iterators)
@@ -40,6 +46,8 @@ species_pool = c("Eryngium_leavenworthii","Polytaenia_nuttalli","Asclepias_asper
                  "Chasmanthium_atifolium","Chloris_cucullata",
                  "Digitaria_ciliaris","Eragrostis_trichodes","Schizachyrium_scoparium",
                  "Sorghastrum_nutans","Sporobolus_airoides","Sporobolus_cryptandrus","Ipomopsis_rubra")
+
+## DWS: why is their hard coded data?
 
 ## Sample from 10 - 40 species, each sampling number have 100 replication sampling
 
@@ -87,8 +95,8 @@ phyloSig1$P.value = as.numeric(phyloSig1$P.value)
 
 resam_ttl_var = (phyloSig1 %>% nrow())/4
 
-dir.create("./Output")
-setwd("./Output")
+#dir.create("./Output")  ## ACK! NO
+#setwd("./Output")  ## NO!
 
 foreach(i = seq_along(unique(phyloSig1$Variables)), .combine = rbind) %dopar% {
   
@@ -106,7 +114,7 @@ foreach(i = seq_along(unique(phyloSig1$Variables)), .combine = rbind) %dopar% {
   ## portion distribution along the increase number of sampling species
   p_dis = phyloSig_i %>% group_by(resample_spp) %>% dplyr::summarise(cnt = n()) %>% mutate(perc = cnt/100) %>% arrange(resample_spp)
   
-  pdf(file = paste0("resample_", trait, ".pdf"))
+  pdf(file = file.path("results", paste0("resample_", trait, ".pdf")))
   print( ggplot(p_dis, aes(resample_spp, perc)) 
          + geom_point()
          + theme_bw()
@@ -120,7 +128,7 @@ foreach(i = seq_along(unique(phyloSig1$Variables)), .combine = rbind) %dopar% {
   ## p <= 0.05, black
   ## p > 0.05, grey86
   
-  pdf(file = paste0("resample_k_distr_", trait, ".pdf"))
+  pdf(file = file.path("results", paste0("resample_k_distr_", trait, ".pdf")))
   print(ggplot(phyloSig_i_full, aes(resample_spp, Blomberg.s.K)) +
           geom_point(col = ifelse(phyloSig_i_full$P.value <= 0.05, 'black', 'grey97'), size = 0.05) +
           theme_bw() + ylim(0, 1) +
