@@ -1,15 +1,10 @@
-#
 
-#setwd("~/Desktop/Research Projects/Traits/GitRepo/Traits4") 
-
-## Never use absolute paths in code and never set the working directory in
-## code. Also, this is a different working directory than was set in
-## `lib_dat_prep.R`!
 
 ##########################################################################################
 ############################## 0. Import Raw Measurement Data ############################
 ##########################################################################################
-##library(ape)
+
+## library(ape)
 ## library(nlme)
 ## library(geiger)
 ## library(corpcor)
@@ -141,7 +136,10 @@ phyloposi_family = AllMatrix %>% group_by(Family) %>%
 p_family = ggplot(phyloposi_family, aes(x=phy1, y=phy2, color=Classification)) +
   geom_point() + labs(x="phy1", y="phy2") + 
   geom_text_repel(aes(label = Family), size =3.5) + 
-  theme_bw()
+  scale_color_manual(values=c("#FFC20A", "#64D294", "#C76BA2")) +
+  theme(legend.position = "bottom",
+        panel.background = element_rect(fill = "white", color = 'black'),
+        panel.grid.major = element_line(color = 'grey', linetype = 'dotted'))
 
 print(p_family) 
 
@@ -158,8 +156,8 @@ A = TreeAllMatrix$tip.label
 appendix_G = merge(appendix, Germination)
 
 B1 = appendix_G %>% mutate (Species1 = factor(Species, level = rev(A)),
-                  Classification1 = factor(Classification, levels = c("Asteracea", "Other_Dicot", "Monoct"), 
-                                                   ordered = TRUE)) 
+                            Classification1 = factor(Classification, levels = c("Asteracea", "Other_Dicot", "Monoct"), 
+                                                     ordered = TRUE)) 
 
 G1 = B1[with(B1, order(Classification1, Species1)),] 
 #write_csv(G1, "Input/Reordered_AllMatrix.csv")
@@ -173,11 +171,13 @@ Mass_Figure <- ggplot(G2, aes(y = mean_Mass, x = reorder(Species, -SpeciesNum)))
   geom_point(aes(shape = Classification, color = Classification)) + 
   geom_errorbar(aes(ymin=mean_Mass - se_Mass, ymax=mean_Mass + se_Mass, color = Classification))+
   labs(y = "Mass(log)") +
-  theme_bw() + 
-  theme (axis.title.y = element_blank(),
-         axis.text.y = element_blank(),
-         axis.ticks.y = element_blank(),
-         ) +
+  scale_color_manual(values=c("#FFC20A", "#64D294", "#C76BA2")) +
+  theme(legend.position = "bottom",
+        panel.background = element_rect(fill = "white", color = 'black'),
+        panel.grid.major = element_line(color = 'grey93', linetype = 'solid'),
+        axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
   coord_flip()
 #Mass_Figure
 
@@ -185,11 +185,13 @@ Height_Figure <- ggplot(G2, aes(y = mean_Height, x = reorder(Species, -SpeciesNu
   geom_point(aes(shape = Classification, color = Classification)) + 
   geom_errorbar(aes(ymin=mean_Height - se_Height, ymax=mean_Height + se_Height, color = Classification))+
   labs(y = "Height (mm)") +
-  theme_bw() +
-  theme (axis.title.y = element_blank(),
-         axis.text.y = element_blank(),
-         axis.ticks.y = element_blank(),
-        ) +
+  scale_color_manual(values=c("#FFC20A", "#64D294", "#C76BA2")) +
+  theme(legend.position = "bottom",
+        panel.background = element_rect(fill = "white", color = 'black'),
+        panel.grid.major = element_line(color = 'grey93', linetype = 'solid'),
+        axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
   coord_flip()
 #Height_Figure
 
@@ -197,11 +199,13 @@ Area_Figure <- ggplot(G2, aes(y = mean_Area, x = reorder(Species, -SpeciesNum)))
   geom_point(aes(shape = Classification, color = Classification)) + 
   geom_errorbar(aes(ymin=mean_Area - se_Area, ymax=mean_Area + se_Area, color = Classification))+
   labs(y = "Area (sq mm)") +
-  theme_bw() +
-  theme (axis.title.y = element_blank(),
-         axis.text.y = element_blank(),
-         axis.ticks.y = element_blank(),
-  ) +
+  scale_color_manual(values=c("#FFC20A", "#64D294", "#C76BA2")) +
+  theme(legend.position = "bottom",
+        panel.background = element_rect(fill = "white", color = 'black'),
+        panel.grid.major = element_line(color = 'grey93', linetype = 'solid'),
+        axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
   coord_flip()
 #Area_Figure
 
@@ -209,11 +213,13 @@ Germination_Figure <- ggplot(G2, aes(y = mean_Germination, x = reorder(Species, 
   geom_point(aes(shape = Classification, color = Classification)) + 
   geom_errorbar(aes(ymin=mean_Germination - se_Germination, ymax=mean_Germination + se_Germination, color = Classification))+
   labs(y = "Germination (%)") +
-  theme_bw() +
-  theme (axis.title.y = element_blank(),
-         axis.text.y = element_blank(),
-         axis.ticks.y = element_blank(),
-  ) +
+  scale_color_manual(values=c("#FFC20A", "#64D294", "#C76BA2")) +
+  theme(legend.position = "bottom",
+        panel.background = element_rect(fill = "white", color = 'black'),
+        panel.grid.major = element_line(color = 'grey93', linetype = 'solid'),
+        axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()) +
   coord_flip()
 #Germination_Figure
 
@@ -229,16 +235,15 @@ classification = list(asteracea = G2$Species[1:8],
 
 t = ggtree(TreeAllMatrix, branch.length ='none')
 
-t2 = groupOTU(t, classification, 'Classification') + aes(color = Classification) + geom_treescale(x=20, y =1, offset = 2, color = "white") + geom_tiplab(size = 3.8, fontface = 'italic') + theme(legend.position = "none")
+
+t2 = groupOTU(t, classification, 'Classification') + aes(color = Classification) + geom_treescale(x=20, y =1, offset = 2, color = "white") + geom_tiplab(size = 3.8, fontface = 'italic') + theme(legend.position = "none") + scale_color_manual(values=c("#FFC20A", "#64D294", "#C76BA2"))
 
 t2
 
 #3.3 Patched Figures
 
-(t2 + guides(colour = "none")) + Mass_Figure + Height_Figure + Area_Figure + Germination_Figure + plot_layout(widths = c(2,1,1,1,1), guides = "collect") & theme(legend.position = 'bottom')
 
-
-
+(t2 + guides(colour = "none")) + Mass_Figure + Height_Figure + Area_Figure + Germination_Figure + plot_layout(widths = c(2.5,1,1,1,1), guides = "collect") & theme(legend.position = 'bottom')
 
 
 ##########################################################################################
