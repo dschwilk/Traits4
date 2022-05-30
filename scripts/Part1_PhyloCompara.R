@@ -3,6 +3,7 @@
 ##########################################################################################
 ############################## 0. Import Raw Measurement Data ############################
 ##########################################################################################
+
 ## library(ape)
 ## library(nlme)
 ## library(geiger)
@@ -142,7 +143,6 @@ p_family = ggplot(phyloposi_family, aes(x=phy1, y=phy2, color=Classification)) +
 
 print(p_family) 
 
-
 ##########################################################################################
 ################### 3. Array Trait Value with Phylogenetic Tree ##########################
 ##########################################################################################
@@ -235,11 +235,13 @@ classification = list(asteracea = G2$Species[1:8],
 
 t = ggtree(TreeAllMatrix, branch.length ='none')
 
+
 t2 = groupOTU(t, classification, 'Classification') + aes(color = Classification) + geom_treescale(x=20, y =1, offset = 2, color = "white") + geom_tiplab(size = 3.8, fontface = 'italic') + theme(legend.position = "none") + scale_color_manual(values=c("#FFC20A", "#64D294", "#C76BA2"))
 
 t2
 
 #3.3 Patched Figures
+
 
 (t2 + guides(colour = "none")) + Mass_Figure + Height_Figure + Area_Figure + Germination_Figure + plot_layout(widths = c(2.5,1,1,1,1), guides = "collect") & theme(legend.position = 'bottom')
 
