@@ -1,33 +1,34 @@
 
-#setwd("~/Desktop/Research Projects/Traits/GitRepo/Traits4") 
 
 ##########################################################################################
 ############################## 0. Import Raw Measurement Data ############################
 ##########################################################################################
-library(ape)
-library(nlme)
-library(geiger)
-library(corpcor)
-library(nloptr)
-library(RColorBrewer)
-library(OUwie)
-library(readxl)
-library(plyr)
-library(tidyverse)
-library(phytools)
-library(MASS)
-library(ggplot2)
-library(ggrepel)
-library(AICcmodavg)
-library(MASS)
-library(broom)
-library(patchwork)
-library(ggtree)
+## library(ape)
+## library(nlme)
+## library(geiger)
+## library(corpcor)
+## library(nloptr)
+## library(RColorBrewer)
+## library(OUwie)
+## library(readxl)
+## library(plyr)
+## library(tidyverse)
+## library(phytools)
+## library(MASS)
+## library(ggplot2)
+## library(ggrepel)
+## library(AICcmodavg)
+## library(MASS)
+## library(broom)
+## library(patchwork)
+## library(ggtree)
 
 ## Trait Value Data
-InputMatrix <- read.csv("Input/RawData.csv")  # Import Raw Measurement Data
+InputMatrix <- read.csv("./data/RawData.csv")  # Import Raw Measurement Data
 
 Rep = 10 # Number of replicates in measurements
+
+## DWS: hard coded data?
 
 appendix = InputMatrix %>% group_by(Family, Species, Classification) %>% 
   dplyr::summarise (mean_Area = mean(Area), se_Area = sd(Area)/sqrt(Rep), 
@@ -35,7 +36,7 @@ appendix = InputMatrix %>% group_by(Family, Species, Classification) %>%
              mean_Mass = mean(Mass), 
              se_Mass = sd(Mass/sqrt(Rep))) 
 
-Germination = read_xlsx("Input/Germination(sd_se).xlsx") %>%
+Germination = read_xlsx("data/Germination(sd_se).xlsx") %>%
   mutate(mean_Germination = mean) %>%
   mutate(se_Germination = se) %>%
   dplyr::select(Species, mean_Germination, se_Germination) 
@@ -44,7 +45,7 @@ Germination = read_xlsx("Input/Germination(sd_se).xlsx") %>%
 ############################## 1. Building Phylogeny #####################################
 ##########################################################################################
 ## Prepare Phylogenetic Tree
-treeVascularPlants <- read.tree("Input/Vascular_Plants_rooted.tre")
+treeVascularPlants <- read.tree("data/Vascular_Plants_rooted.tre")
 tips <-treeVascularPlants$tip.label
 Genera<-unique(sapply(strsplit(tips,"_"),function(x) x[1]))
 
@@ -76,8 +77,10 @@ PruneTree <- function(x){
   aaa <- data_frame(DesiredSpecies = DesiredSpecies, 
                     TreeGenera = sapply(strsplit(DesiredSpecies,"_"),function(x) x[1]))
   bbb <- merge(aaa, SpeciesListGenera)
-  
-  treeTestedSpecies$tip.label <- mapvalues(treeTestedSpecies$tip.label, c(bbb$TreeSpecies), c(bbb$DesiredSpecies))
+
+   ## DWS: where is mapvalues function from? Ah, old plyr! Rewrite!
+  treeTestedSpecies$tip.label <- plyr::mapvalues(treeTestedSpecies$tip.label,
+                                           c(bbb$TreeSpecies), c(bbb$DesiredSpecies))
   tree_x <- treeTestedSpecies
   plotTree(tree_x, ftype="i")
   return(tree_x)
@@ -86,6 +89,9 @@ PruneTree <- function(x){
 TreeInputMatrix <- PruneTree(unique(InputMatrix$Species))
 
 b = setdiff(unique(InputMatrix$Species), TreeInputMatrix$tip.label)
+
+
+## DWS: why is there hard coded data here? Why is this not from a data file?
 
 ## Adding "Callirhoe_leiocarpa"
 tip1 <- "Callirhoe_leiocarpa"
