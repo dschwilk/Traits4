@@ -38,3 +38,6 @@ Main directory (git root)
     func_model_aicc.R
     func_phylosig_parallel.R
 ```
+## Citation ##
+Cite the code: [![DOI](https://zenodo.org/badge/480624515.svg)](https://zenodo.org/badge/latestdoi/480624515)
+
