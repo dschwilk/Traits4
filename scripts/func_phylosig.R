@@ -10,7 +10,7 @@ PhyloSig = function(TreeAllMatrix, dat){
   
   
   dist = cophenetic.phylo(TreeAllMatrix)
-  phyloposi = isoMDS(dist, trace = F) %>% as.data.frame()
+  phyloposi = MASS::isoMDS(dist, trace = F) %>% as.data.frame()
   
   phyloposi_species = phyloposi %>% mutate(Species = row.names(phyloposi)) %>% 
     mutate(phy1 = round(scale(points.1),digits = 1)) %>% 
@@ -52,9 +52,11 @@ PhyloSig = function(TreeAllMatrix, dat){
   
   Variables = c("Mass", "Height", "Area", "Germination")
   
-  tab_phyloSig1 = data.frame(cbind(Variables,tab_phyloSig)) %>% 
-    mutate(resample_spp = resample_spp) %>%
-    mutate(resample_rpt = resample_rpt)
+  tab_phyloSig1 = data.frame(cbind(Variables,tab_phyloSig)) 
+  
+  #%>% 
+  #mutate(resample_spp = resample_spp) %>%
+  #mutate(resample_rpt = resample_rpt)
   
   tab_phyloSig1
 }

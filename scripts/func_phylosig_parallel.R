@@ -10,7 +10,7 @@ PhyloSig_para = function(TreeAllMatrix, dat, resample_spp){
   
   
   dist = cophenetic.phylo(TreeAllMatrix)
-  phyloposi = isoMDS(dist, trace = F) %>% as.data.frame()
+  phyloposi = MASS::isoMDS(dist, trace = F) %>% as.data.frame()
   
   phyloposi_species = phyloposi %>% mutate(Species = row.names(phyloposi)) %>% 
     mutate(phy1 = round(scale(points.1),digits = 1)) %>% 

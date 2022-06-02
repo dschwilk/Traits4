@@ -13,7 +13,7 @@ Model_AICc = function(TreeAllMatrix, dat){
   ## dat is a list of trait value of different species
   
   dist = cophenetic.phylo(TreeAllMatrix)
-  phyloposi = isoMDS(dist, trace = F) %>% as.data.frame()
+  phyloposi = MASS::isoMDS(dist, trace = F) %>% as.data.frame()
   
   phyloposi_species = phyloposi %>% mutate(Species = row.names(phyloposi)) %>% 
     mutate(phy1 = round(scale(points.1),digits = 1)) %>% 
@@ -42,7 +42,7 @@ Model_AICc = function(TreeAllMatrix, dat){
   
   glmmodels = lapply(models, function(x) glm(x, data = AllMatrix_G_scaled))
   
-  AICc = sapply(models, function(x) AICc(glm(x, data = AllMatrix_G_scaled), 
+  AICc = sapply(models, function(x) AICcmodavg::AICc(glm(x, data = AllMatrix_G_scaled), 
                                          return.K = FALSE))
   
   names(AICc) = sapply(glmmodels, function(x) x$formula)
@@ -50,8 +50,10 @@ Model_AICc = function(TreeAllMatrix, dat){
   tab_model = data_frame(names(AICc),AICc)
   colnames(tab_model) = c("Model", "AICc")
   
-  tab_models = tab_model %>% mutate(resample_spp = resample_spp) %>%
-    mutate(resample_rpt = resample_rpt)
+  #tab_models = tab_model %>% mutate(resample_spp = resample_spp) %>%
+   # mutate(resample_rpt = resample_rpt)
+  
+  tab_models = tab_model[order(AICc),]
   
   tab_models
   

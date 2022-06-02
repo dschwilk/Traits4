@@ -3,8 +3,9 @@
 ###################### Function of Pruning and Replace Species on a Tree ######################################
 ##############################################################################################################
 
-## The functioon help to Prun the tree 
+## The function help to Prune the tree 
 ## also place the species according to its general, if the exact species is not on the tree
+## assuming the phylogenetic relationship based on their taxinomic relationship
 ## limitation: only one species can use replacement method
 
 PruneTree <- function(desir_species, master_tree){

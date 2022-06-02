@@ -1,17 +1,10 @@
-## DWS: this script is named "part 2" but it sources in the lib_dat_prep.R code
-## that reads in data. The aprt 1 code does not. I do not understand the
-## organization.
+## Part2 Simulation of different sample pools 
+## using parallel computing to test phylogenetic signal
 
-## source the scripts: data and functions
-source("scripts/lib_dat_prep.R")
-source("scripts/func_prun_replac.R")
-source("scripts/func_phylosig.R")
+## function for parallel computing for resampling tests
 source("scripts/func_phylosig_parallel.R")
-source("scripts/func_model_aicc.R")
 
-
-#library(dplyr)
-#library(ggplot2)
+## libraries for parallel computing for resampling tests
 library(parallel)
 library(foreach)
 library(iterators)
@@ -28,26 +21,14 @@ registerDoParallel(NumberOfCluster)
 
 ## define species pool
 
-species_pool = c("Eryngium_leavenworthii","Polytaenia_nuttalli","Asclepias_asperula",
-                 "Centaurea_americana","Coreopsis_lanceolata","Coreopsis_tinctoria",
-                 "Echinacea_angustifolia","Gutierrezia_sarothrae","Helianthus_annuus",
-                 "Liatris_mucronata","Ratibida_columnifera","Tradescantia_occidentalis",
-                 "Astragalus_crassicarpus","Desmanthus_illinoensis","Corydalis_curvisiliqua",
-                 "Phacelia_congesta","Herbertia_lahue","Monarda_citriodora","Salvia_azurea",
-                 "Salvia_coccinea","Salvia_farinacea","Salvia_lyrata","Linum_rigidum",
-                 "Callirhoe_involucrata","Pavonia_lasiopetala","Oenothera_rhombipetala",
-                 "Argemone_albiflora","Phytolacca_americana","Rivina_humilis","Andropogon_gerardii",
-                 "Aristida_purpurea","Bouteloua_curtipendula","Bouteloua_gracilis", 
-                 "Chasmanthium_atifolium","Chloris_cucullata",
-                 "Digitaria_ciliaris","Eragrostis_trichodes","Schizachyrium_scoparium",
-                 "Sorghastrum_nutans","Sporobolus_airoides","Sporobolus_cryptandrus","Ipomopsis_rubra")
+species_pool = TreeAllMatrix$tip.label
 
-## DWS: why is their hard coded data?
+
 
 ## Sample from 10 - 40 species, each sampling number have 100 replication sampling
 
 resample_spp_min = 10
-resample_spp_max = length(species_pool) - 2
+resample_spp_max = length(species_pool) - 5
 resample_spp_rpt = 100
 
 resample_spp_list = lapply(resample_spp_min:resample_spp_max, function(x) lapply(1:resample_spp_rpt, function(i) 
@@ -61,7 +42,7 @@ rownames(resample_spp_list_3) = paste0("repeat_", 1:resample_spp_rpt)
 
 ## Calculate Phylogenetic Signal of each sample pool
 
-res2 = foreach (i = 1:(resample_spp_max - resample_spp_min + 1), .combine = rbind) %:% 
+res = foreach (i = 1:(resample_spp_max - resample_spp_min + 1), .combine = rbind) %:% 
   ## i is the related withdraw number of species, column of resample_spp_list_3
   
   foreach(j=1:resample_spp_rpt, .combine = rbind) %dopar% {
@@ -70,11 +51,11 @@ res2 = foreach (i = 1:(resample_spp_max - resample_spp_min + 1), .combine = rbin
     resample_spp = resample_spp_min + i - 1
     resample_rpt = j
     
-    TreeAllMatrix = PruneTree(resampling_spp, treeVascularPlants)
+    Tree = keep.tip(TreeAllMatrix, resampling_spp)
     
-    dat_sp = dat %>% filter(dat$Species %in% TreeAllMatrix$tip.label)
+    dat_sp = dat %>% filter(dat$Species %in% Tree$tip.label)
     
-    PhyloSig_para =  PhyloSig_para(TreeAllMatrix, dat_sp) %>% mutate(resample_spp = resample_spp) %>% mutate(resample_spp_rpt = resample_rpt) %>% mutate(resampling_spp = list(resampling_spp))
+    PhyloSig_para =  PhyloSig_para(Tree, dat_sp) %>% mutate(resample_spp = resample_spp) %>% mutate(resample_spp_rpt = resample_rpt) %>% mutate(resampling_spp = list(resampling_spp))
     
     as.data.frame(PhyloSig_para)
     
@@ -83,26 +64,25 @@ res2 = foreach (i = 1:(resample_spp_max - resample_spp_min + 1), .combine = rbin
 
 ## explore the data in dplyr
 
-phyloSig1 = res2 
+phyloSig = res 
 
-phyloSig1$Blomberg.s.K = as.numeric(phyloSig1$Blomberg.s.K)
-phyloSig1$P.value = as.numeric(phyloSig1$P.value)
+phyloSig$Blomberg.s.K = as.numeric(phyloSig$Blomberg.s.K)
+phyloSig$P.value = as.numeric(phyloSig$P.value)
 
-resam_ttl_var = (phyloSig1 %>% nrow())/4
+resam_ttl_var = (phyloSig %>% nrow())/4
 
-#dir.create("./Output")  ## ACK! NO
-#setwd("./Output")  ## NO!
+## generate figures for Figure 3 and Figure 4
 
-foreach(i = seq_along(unique(phyloSig1$Variables)), .combine = rbind) %dopar% {
+foreach(i = seq_along(unique(phyloSig$Variables)), .combine = rbind) %dopar% {
   
-  trait = unique(phyloSig1$Variables) [[i]]
+  trait = unique(phyloSig$Variables) [[i]]
   
   ########## character: all data
   
   ## i is the seed trait in analysis:
-  phyloSig_i_full = phyloSig1 %>% dplyr::filter(Variables == trait) 
+  phyloSig_i_full = phyloSig %>% dplyr::filter(Variables == trait) 
   
-  phyloSig_i = phyloSig1 %>% dplyr::filter(Variables == trait) %>% 
+  phyloSig_i = phyloSig %>% dplyr::filter(Variables == trait) %>% 
     dplyr::filter(P.value <0.05) 
   #saveRDS(phyloSig_i, file = paste0('phyloSig_i_', trait, '.rds'))
   ## portion distribution along the increase number of sampling species
