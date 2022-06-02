@@ -1,4 +1,4 @@
-# Traits4
+# README: PhyloCompareTraits
 
 
 ## Overview
@@ -29,9 +29,9 @@ Main directory (git root)
     resample_Area.pdf
     resample_Germination.pdf
   scripts
-  	 lib_dat_prep.R
-  	 Part1_PhyloCompara.R
-  	 Part2_Sim_Para.R
+  	Part0_lib_dat_prep.R
+  	Part1_PhyloCompara.R
+  	Part2_Sim_Para.R
     func_prun_replac.R
     func_bind_sister_tip.R
     func_phylosig.R
