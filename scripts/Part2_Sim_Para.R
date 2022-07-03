@@ -100,15 +100,18 @@ foreach(i = seq_along(unique(phyloSig$Variables)), .combine = rbind) %dopar% {
   graphics.off()
   
   ## distribution of K-value
-  ## p <= 0.05, black
-  ## p > 0.05, grey86
+  ## p <= 0.05, col = "black", shape = 19
+  ## p > 0.05, col = "grey70", shape = 1
   
   pdf(file = file.path("results", paste0("resample_k_distr_", trait, ".pdf")))
+  
   print(ggplot(phyloSig_i_full, aes(resample_spp, Blomberg.s.K)) +
-          geom_point(col = ifelse(phyloSig_i_full$P.value <= 0.05, 'black', 'grey97'), size = 0.05) +
+          geom_point(col = ifelse(phyloSig_i_full$P.value <= 0.05, 'black', 'grey70'), shape = ifelse(phyloSig_i_full$P.value <= 0.05, 19, 1), size = 1, position = "jitter") +
           theme_bw() + ylim(0, 1) +
           labs(x = "number of resample species",
                y = "the value of Blomberg's K"))
+  
+  
   graphics.off()
   
 }  
