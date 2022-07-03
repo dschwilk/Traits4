@@ -29,12 +29,15 @@ Main directory (git root)
     resample_Area.pdf
     resample_Germination.pdf
   scripts
-  	Part0_lib_dat_prep.R
-  	Part1_PhyloCompara.R
-  	Part2_Sim_Para.R
+    Part0_lib_dat_prep.R
+    Part1_PhyloCompara.R
+    Part2_Sim_Para.R
     func_prun_replac.R
     func_bind_sister_tip.R
     func_phylosig.R
     func_model_aicc.R
     func_phylosig_parallel.R
 ```
+## Citation ##
+Cite the code: [![DOI](https://zenodo.org/badge/480624515.svg)](https://zenodo.org/badge/latestdoi/480624515)
+
